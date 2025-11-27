@@ -880,3 +880,31 @@ Traceback (most recent call last):
 ModuleNotFoundError: No module named 'airflow.providers.standard'
 [2025-11-27T19:19:08.666+0000] {processor.py:842} WARNING - No viable dags retrieved from /opt/airflow/dags/incremental_pipeline.py
 [2025-11-27T19:19:08.685+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/incremental_pipeline.py took 0.044 seconds
+[2025-11-27T19:19:38.779+0000] {processor.py:161} INFO - Started process (PID=88) to work on /opt/airflow/dags/incremental_pipeline.py
+[2025-11-27T19:19:38.780+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/incremental_pipeline.py for tasks to queue
+[2025-11-27T19:19:38.783+0000] {logging_mixin.py:188} INFO - [2025-11-27T19:19:38.783+0000] {dagbag.py:545} INFO - Filling up the DagBag from /opt/airflow/dags/incremental_pipeline.py
+[2025-11-27T19:19:38.789+0000] {logging_mixin.py:188} INFO - [2025-11-27T19:19:38.787+0000] {dagbag.py:355} ERROR - Failed to import: /opt/airflow/dags/incremental_pipeline.py
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/dagbag.py", line 351, in parse
+    loader.exec_module(new_module)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/opt/airflow/dags/incremental_pipeline.py", line 2, in <module>
+    from airflow.providers.standard.operators.bash import BashOperator
+ModuleNotFoundError: No module named 'airflow.providers.standard'
+[2025-11-27T19:19:38.789+0000] {processor.py:842} WARNING - No viable dags retrieved from /opt/airflow/dags/incremental_pipeline.py
+[2025-11-27T19:19:38.811+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/incremental_pipeline.py took 0.046 seconds
+[2025-11-27T19:20:09.027+0000] {processor.py:161} INFO - Started process (PID=89) to work on /opt/airflow/dags/incremental_pipeline.py
+[2025-11-27T19:20:09.029+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/incremental_pipeline.py for tasks to queue
+[2025-11-27T19:20:09.035+0000] {logging_mixin.py:188} INFO - [2025-11-27T19:20:09.034+0000] {dagbag.py:545} INFO - Filling up the DagBag from /opt/airflow/dags/incremental_pipeline.py
+[2025-11-27T19:20:09.042+0000] {logging_mixin.py:188} INFO - [2025-11-27T19:20:09.040+0000] {dagbag.py:355} ERROR - Failed to import: /opt/airflow/dags/incremental_pipeline.py
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/dagbag.py", line 351, in parse
+    loader.exec_module(new_module)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/opt/airflow/dags/incremental_pipeline.py", line 2, in <module>
+    from airflow.providers.standard.operators.bash import BashOperator
+ModuleNotFoundError: No module named 'airflow.providers.standard'
+[2025-11-27T19:20:09.042+0000] {processor.py:842} WARNING - No viable dags retrieved from /opt/airflow/dags/incremental_pipeline.py
+[2025-11-27T19:20:09.060+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/incremental_pipeline.py took 0.045 seconds
