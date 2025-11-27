@@ -5,31 +5,26 @@ import os
 import glob
 import shutil
 
-RAW_PATH = "../../data/incremental/raw/*/"
-PROCESSED_FILE = "../../data/incremental/raw/*/orders_*.csv"
+RAW_BASE = "../../data/incremental/raw/"
+PROCESSED_FILE = "../../data/processed/orders.csv"
 TMP_DIR = "../../data/incremental/processed/tmp/"
 
 def get_last_processed_day(r):
-    """Retrieve last processed day from Redis (0 if nothing processed)."""
     value = r.get("last_processed_day")
     return int(value) if value else 0
-
 
 def set_last_processed_day(r, day):
     r.set("last_processed_day", day)
 
-
 def get_available_days():
-    """Return sorted list of integer folder names."""
-    folders = glob.glob("../../data/incremental/raw/*")
+    folders = glob.glob(f"{RAW_BASE}*")
     return sorted([int(os.path.basename(f)) for f in folders])
-
 
 def main():
 
     spark = SparkSession.builder.appName("IncrementalOrderAggregation").getOrCreate()
 
-    r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+    r = redis.Redis(host="172.20.0.2", port=6379, decode_responses=True)
 
     last_processed = get_last_processed_day(r)
     print(f"Last processed day in Redis: {last_processed}")
@@ -45,16 +40,17 @@ def main():
         spark.stop()
         return
 
-    input_paths = [f"../../data/incremental/raw/{day}/orders_*.csv" for day in new_days]
-
+    input_paths = [f"{RAW_BASE}{day}/orders_*.csv" for day in new_days]
     df = spark.read.option("header", True).option("inferSchema", True).csv(input_paths)
 
     category_cols = df.columns[4:]
     agg_exprs = [sum(col(c)).alias(c) for c in category_cols]
 
-    agg_df = df.groupBy("order_dow", "order_hour_of_day") \
-               .agg(*agg_exprs) \
-               .orderBy("order_dow", "order_hour_of_day")
+    agg_df = (
+        df.groupBy("order_dow", "order_hour_of_day")
+          .agg(*agg_exprs)
+          .orderBy("order_dow", "order_hour_of_day")
+    )
 
     os.makedirs(os.path.dirname(PROCESSED_FILE), exist_ok=True)
 
