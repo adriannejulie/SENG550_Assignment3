@@ -6,7 +6,7 @@ import glob
 import shutil
 
 RAW_PATH = "../../data/incremental/raw/*/"
-PROCESSED_FILE = "../../data/incremental/processed/orders.csv"
+PROCESSED_FILE = "../../data/incremental/raw/*/orders_*.csv"
 TMP_DIR = "../../data/incremental/processed/tmp/"
 
 def get_last_processed_day(r):
