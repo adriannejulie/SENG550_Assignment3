@@ -7,9 +7,11 @@ import shutil
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent.parent.parent.resolve()
-RAW_BASE = BASE_DIR / "data/incremental/raw"
-PROCESSED_FILE = BASE_DIR / "data/processed/orders.csv"
-TMP_DIR = BASE_DIR / "data/incremental/processed/tmp"
+
+RAW_BASE = BASE_DIR / "data/incremental/raw/*"
+PROCESSED_DIR = BASE_DIR / "data/incremental/processed"
+PROCESSED_FILE = PROCESSED_DIR / "orders.csv"
+TMP_DIR = BASE_DIR/"data/incremental/tmp/"
 
 def get_last_processed_day(r):
     value = r.get("last_processed_day")
@@ -24,7 +26,12 @@ def get_available_days():
 
 def main():
 
-    spark = SparkSession.builder.appName("IncrementalOrderAggregation").getOrCreate()
+    spark = (
+        SparkSession.builder
+        .appName("IncrementalOrderAggregation")
+        .config("spark.sql.debug.maxToStringFields", "2000")
+        .getOrCreate()
+    )
 
     r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
@@ -57,10 +64,10 @@ def main():
     os.makedirs(os.path.dirname(PROCESSED_FILE), exist_ok=True)
 
     if os.path.exists(PROCESSED_FILE):
-        existing = spark.read.option("header", True).csv(PROCESSED_FILE)
+        existing = spark.read.option("header", True).csv(str(PROCESSED_FILE))
         agg_df = existing.unionByName(agg_df)
 
-    agg_df.write.mode("overwrite").option("header", True).csv(TMP_DIR)
+    agg_df.write.mode("overwrite").option("header", True).csv(str(TMP_DIR))
 
     part_file = [f for f in os.listdir(TMP_DIR) if f.startswith("part-")][0]
     shutil.move(os.path.join(TMP_DIR, part_file), PROCESSED_FILE)
