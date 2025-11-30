@@ -4,10 +4,12 @@ import redis
 import os
 import glob
 import shutil
+from pathlib import Path
 
-RAW_BASE = "../../data/incremental/raw/"
-PROCESSED_FILE = "../../data/processed/orders.csv"
-TMP_DIR = "../../data/incremental/processed/tmp/"
+BASE_DIR = Path(__file__).parent.parent.parent.resolve()
+RAW_BASE = BASE_DIR / "data/incremental/raw"
+PROCESSED_FILE = BASE_DIR / "data/processed/orders.csv"
+TMP_DIR = BASE_DIR / "data/incremental/processed/tmp"
 
 def get_last_processed_day(r):
     value = r.get("last_processed_day")
@@ -24,7 +26,7 @@ def main():
 
     spark = SparkSession.builder.appName("IncrementalOrderAggregation").getOrCreate()
 
-    r = redis.Redis(host="172.20.0.2", port=6379, decode_responses=True)
+    r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
     last_processed = get_last_processed_day(r)
     print(f"Last processed day in Redis: {last_processed}")
@@ -58,7 +60,7 @@ def main():
         existing = spark.read.option("header", True).csv(PROCESSED_FILE)
         agg_df = existing.unionByName(agg_df)
 
-    agg_df.coalesce(1).write.mode("overwrite").option("header", True).csv(TMP_DIR)
+    agg_df.write.mode("overwrite").option("header", True).csv(TMP_DIR)
 
     part_file = [f for f in os.listdir(TMP_DIR) if f.startswith("part-")][0]
     shutil.move(os.path.join(TMP_DIR, part_file), PROCESSED_FILE)

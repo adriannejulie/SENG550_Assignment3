@@ -1,3 +1,27 @@
 Part 2:
+
+RUN Redis:
+docker ps
+docker exec -it <CONTAINER_ID> sh
+redis-cli
+DEL last_processed_day
+ping
+
+In another terminal:
+Test the Redis connection:
+cd processing/incremental
+python3 ex2_incremental.py
+
+
+mkdir ../../data/incremental/raw/3
+cp ../../data/incremental/raw/2/orders_2.csv ../../data/incremental/raw/3/orders_3.csv
+python3 ex2_incremental.py
+
+airflow db init
 airflow scheduler
-airflow webserver
+airflow api-server
+
+
+Testing: 
+airflow dags trigger schedule_interval
+TEST Spark: python -c "import pyspark; print('spark ok')"
